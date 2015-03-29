@@ -69,12 +69,15 @@ public class AESprincipal {
     {"53","39","84","3C","41","A2","6D","47","14","2A","9E","5D","56","F2","D3","AB"},
     {"44","11","92","D9","23","20","2E","89","B4","7C","B8","26","77","99","E3","A5"},
     {"67","4A","ED","DE","C5","31","FE","18","0D","63","8C","80","C0","F7","70","07"}};
+    public static String [][] m = new String[4][4];
+    public static String [][] k = new String[4][4];
+    public static Scanner datos = new Scanner(System.in);
+    public static int opcion_menu1;
     
     public static void main(String[] args) {
         // TODO code application logic here
         Scanner opcion1 = new Scanner(System.in);
         int opcion_menu;
-        int opcion_menu1;
         do{
             menu();
             opcion_menu = opcion1.nextInt();
@@ -88,7 +91,28 @@ public class AESprincipal {
                     System.out.println("Hex value is " + decimal);
                     String [][] mensaje={{"41","65","75","61"},{"45","73","79","63"},{"53","20","20","69"},{"20","6D","66","6C"}};
                     String [][] key={{"2B","28","AB","09"},{"7E","AE","F7","CF"},{"15","D2","15","4F"},{"16","A6","88","3C"}};
-                    break;
+                    
+                    String[] cadena2;
+                    lecturaKey();
+                    cadena2 = lecturaDatos();
+                    int i = 0;
+                    while(i<cadena2.length){
+                        for(int j=0;j<4;j++){
+                            for(int k=0;k<4;k++){
+                                m[k][j]=cadena2[i];
+                                i++;
+                            }
+                        }
+                        for(int k=0;k<4;k++){
+                            for(int j=0;j<4;j++){
+                                System.out.print(m[k][j]);
+                            }
+                            System.out.println();
+                        }
+                    cifrado(m,k);
+                    }    
+                    
+                    break; 
                 }
                 case 2:{
                     menu2();
@@ -97,6 +121,224 @@ public class AESprincipal {
                 }
             }
         }while(opcion_menu!=3);
+    }
+    
+    private static void lecturaKey(){
+        System.out.println("\nIngrese la llave: ");
+        String key = datos.nextLine();
+        char[] charArrayKey = key.toCharArray();
+        int[] arregloAsciiKey = new int[charArrayKey.length];
+        String[] arregloHexa = new String[16];
+         for (int i=0;i<arregloAsciiKey.length;i++){
+            arregloAsciiKey[i]= charArrayKey[i];
+            arregloHexa[i] = Integer.toHexString(arregloAsciiKey[i]);
+        }
+        for(int i=0;i<4;i++){
+            for(int j=0;j<4;j++){
+                k[i][j]=arregloHexa[(4*j)+i];
+                
+            }
+        }         
+    }
+    
+    private static String[] lecturaDatos(){
+        System.out.println("\nIngrese el mensaje : ");
+        String mensaje = datos.nextLine();
+        int tamaño = 0;
+        int resto = 0;
+        char[] charArray = mensaje.toCharArray();
+        int[] arregloAscii = new int[charArray.length];
+        tamaño =arregloAscii.length/16;
+        int tamañototal=0;
+        for(int i=1;i<10;i++){
+            if(arregloAscii.length<16*i){
+                tamañototal=i;
+                i=10;
+            }
+        }
+                
+        String[] arregloHexa = new String[16*tamañototal];
+        for (int i=0;i<charArray.length;i++){
+            arregloAscii[i]= charArray[i];
+            arregloHexa[i] = Integer.toHexString(arregloAscii[i]);
+        }
+        for (int i=arregloAscii.length;i<arregloHexa.length;i++){
+            arregloHexa[i]= "00";
+        }
+              
+        return arregloHexa;
+    }
+    
+    private static void cifrado(String[][] M,String[][] K){
+        int tamañoC = 0;
+        switch(opcion_menu1){
+            case 1:
+                tamañoC = 40; 
+                break;
+            case 2:
+                tamañoC = 48;
+                break;
+            case 3:
+                tamañoC = 56;
+                break;
+        }
+        String[][] subKeys = new String[4][4+tamañoC];
+        for(int i=0;i<4;i++){
+            for(int j=0;j<4;j++){
+                subKeys[i][j] = k[i][j];
+            }
+        }
+        for (int i=4;i<tamañoC;i++){
+            String[] temporal = new String[4];
+            String[] w4 ={subKeys[0][i-4],subKeys[1][i-4],subKeys[2][i-4],subKeys[3][i-4]}; 
+            String[] w1 ={subKeys[0][i-1],subKeys[1][i-1],subKeys[2][i-1],subKeys[3][i-1]};
+            
+            
+            if((i%4)==0){
+                
+                String[] nw4 = new String[4];
+                String[] nw1 = new String[4];
+                String Tw4 = new String();
+                String Tw1 = new String();
+                int [] num4 = new int[32];
+                int [] num1 = new int[32];
+                
+                for(int k=0;k<4;k++){
+                    nw4[k] = String.format("%8s", Integer.toBinaryString(Integer.parseInt(w4[k], 16))).replace(' ', '0');
+                    nw1[k] = String.format("%8s", Integer.toBinaryString(Integer.parseInt(w1[k], 16))).replace(' ', '0');
+                }
+                
+                for(int k=0;k<4;k++){
+                    Tw4 = Tw4 + nw4[k];
+                    Tw1 = Tw1 + nw1[k];
+                }
+                
+                char[] charArray4 = Tw4.toCharArray();
+                char[] charArray1 = Tw1.toCharArray();
+                for (int l = 0; l < charArray4.length; l++) {
+                    if (charArray4[l] == '0') {
+                        num4[l] = 0;
+                    } else {
+                        num4[l] = 1;
+                    }    
+                }
+                for (int l = 0; l < charArray1.length; l++) {
+                    if (charArray1[l] == '0') {
+                        num1[l] = 0;
+                    } else {
+                        num1[l] = 1;
+                    }    
+                }
+                
+                int[] xor41 = xor(num4,funcionT(num1,i));
+                
+                int tamaño = xor41.length/8;
+                String[] xor41T = new String[tamaño];
+                for(int k=0;k<tamaño;k++){
+                    xor41T[k] = Integer.toString(xor41[(k*8)+0]);
+                    xor41T[k] = xor41T[k] + Integer.toString(xor41[(k*8)+1]);
+                    xor41T[k] = xor41T[k] + Integer.toString(xor41[(k*8)+2]);
+                    xor41T[k] = xor41T[k] + Integer.toString(xor41[(k*8)+3]);
+                    xor41T[k] = xor41T[k] + Integer.toString(xor41[(k*8)+4]);
+                    xor41T[k] = xor41T[k] + Integer.toString(xor41[(k*8)+5]);
+                    xor41T[k] = xor41T[k] + Integer.toString(xor41[(k*8)+6]);
+                    xor41T[k] = xor41T[k] + Integer.toString(xor41[(k*8)+7]);
+                }
+                /*for (int i=0;i<cipherT.length;i++){
+                    System.out.println(cipherT[i]);
+                } */
+                int[] xor41F = new int[xor41T.length];
+                for(int k=0;k<xor41T.length;k++){
+                    xor41F[k] = Integer.parseInt(xor41T[k],2);
+                }
+                String[] xor41A = new String[tamaño];
+                for(int k=0;k<xor41T.length;k++){
+                    xor41A[k] = Integer.toHexString(xor41F[k]);
+                }
+                System.out.print("\n");
+                for(int k=0;k<xor41A.length;k++){
+                    System.out.print(xor41A[k]);
+                }
+                
+                //String binary = String.format("%8s", Integer.toBinaryString(numHex)).replace(' ', '0');
+                //System.out.println("NUM "+ numHex+" "+binary);
+                for(int j=0;j<4;j++){
+                 subKeys[j][i]=xor41A[j];   
+                }
+            }
+            else{
+                String[] nw4 = new String[4];
+                String[] nw1 = new String[4];
+                String Tw4 = new String();
+                String Tw1 = new String();
+                int [] num4 = new int[32];
+                int [] num1 = new int[32];
+                
+                for(int k=0;k<4;k++){
+                    nw4[k] = String.format("%8s", Integer.toBinaryString(Integer.parseInt(w4[k], 16))).replace(' ', '0');
+                    nw1[k] = String.format("%8s", Integer.toBinaryString(Integer.parseInt(w1[k], 16))).replace(' ', '0');
+                }
+                
+                for(int k=0;k<4;k++){
+                    Tw4 = Tw4 + nw4[k];
+                    Tw1 = Tw1 + nw1[k];
+                }
+                
+                char[] charArray4 = Tw4.toCharArray();
+                char[] charArray1 = Tw1.toCharArray();
+                for (int l = 0; l < charArray4.length; l++) {
+                    if (charArray4[l] == '0') {
+                        num4[l] = 0;
+                    } else {
+                        num4[l] = 1;
+                    }    
+                }
+                for (int l = 0; l < charArray1.length; l++) {
+                    if (charArray1[l] == '0') {
+                        num1[l] = 0;
+                    } else {
+                        num1[l] = 1;
+                    }    
+                }
+                
+                int[] xor41 = xor(num4,num1);
+                
+                int tamaño = xor41.length/8;
+                String[] xor41T = new String[tamaño];
+                System.out.println("\nTEXTO DESCIFRADO!!! ");
+                for(int k=0;k<tamaño;k++){
+                    xor41T[k] = Integer.toString(xor41[(k*8)+0]);
+                    xor41T[k] = xor41T[k] + Integer.toString(xor41[(k*8)+1]);
+                    xor41T[k] = xor41T[k] + Integer.toString(xor41[(k*8)+2]);
+                    xor41T[k] = xor41T[k] + Integer.toString(xor41[(k*8)+3]);
+                    xor41T[k] = xor41T[k] + Integer.toString(xor41[(k*8)+4]);
+                    xor41T[k] = xor41T[k] + Integer.toString(xor41[(k*8)+5]);
+                    xor41T[k] = xor41T[k] + Integer.toString(xor41[(k*8)+6]);
+                    xor41T[k] = xor41T[k] + Integer.toString(xor41[(k*8)+7]);
+                }
+                /*for (int i=0;i<cipherT.length;i++){
+                    System.out.println(cipherT[i]);
+                } */
+                int[] xor41F = new int[xor41T.length];
+                for(int k=0;k<xor41T.length;k++){
+                    xor41F[k] = Integer.parseInt(xor41T[k],2);
+                }
+                String[] xor41A = new String[tamaño];
+                for(int k=0;k<xor41T.length;k++){
+                    xor41A[k] = Integer.toHexString(xor41F[k]);
+                }
+                System.out.print("\n");
+                for(int k=0;k<xor41A.length;k++){
+                    System.out.print(xor41A[k]);
+                }
+                
+                //String binary = String.format("%8s", Integer.toBinaryString(numHex)).replace(' ', '0');
+                //System.out.println("NUM "+ numHex+" "+binary);
+                for(int j=0;j<4;j++){
+                 subKeys[j][i]=xor41A[j];   
+                }
+            }
+        }
     }
     
     private static void menu() {
@@ -129,4 +371,75 @@ public class AESprincipal {
         System.out.println("Ingrese su opción: ");
     }
     
+    
+    
+    private static void ARK(){
+        
+    }
+    private static void SB(){
+        
+    }
+    private static void SR(){
+        
+    }
+    private static void MC(){
+        
+    }
+    
+    private static int[] xor(int[] a, int[] b) {
+        int[] temporal = new int[a.length];
+        for (int i = 0; i < a.length; i++) {
+            if (a[i] == b[i]) {
+                temporal[i] = 0;
+            } else {
+                temporal[i] = 1;
+            }
+        }
+        return temporal;
+    }
+    
+    private static int[] funcionT (int[] w1 , int indice){
+        String[] w1pos = new String[4];
+        String[] w1posF = new String[4];
+        for(int k=0;k<w1pos.length;k++){
+            w1pos[k] = Integer.toString(w1[(k*8)+0]);
+            w1pos[k] = w1pos[k] + Integer.toString(w1[(k*8)+1]);
+            w1pos[k] = w1pos[k] + Integer.toString(w1[(k*8)+2]);
+            w1pos[k] = w1pos[k] + Integer.toString(w1[(k*8)+3]);
+            w1pos[k] = w1pos[k] + Integer.toString(w1[(k*8)+4]);
+            w1pos[k] = w1pos[k] + Integer.toString(w1[(k*8)+5]);
+            w1pos[k] = w1pos[k] + Integer.toString(w1[(k*8)+6]);
+            w1pos[k] = w1pos[k] + Integer.toString(w1[(k*8)+7]);
+        }
+        
+        String[] w1B = {w1pos[1],w1pos[2],w1pos[3],w1pos[0]};
+        for (int i=0;i<w1pos.length;i++){
+            int temp;
+            temp = Integer.parseInt(w1pos[i],2);
+            String numHexa=Integer.toHexString(temp);
+            char[] tempC = numHexa.toCharArray();
+            int uno = Integer.parseInt(Character.toString(tempC[0]),16);
+            int dos = Integer.parseInt(Character.toString(tempC[1]),16);
+            String binario = Integer.toBinaryString(Integer.parseInt(SBox[uno][dos],16));
+            w1posF[i] = binario;
+        }
+        String total = w1posF[0]+ w1posF[1]+w1posF[2]+w1posF[3];
+        char[] temporal = total.toCharArray();
+        int[] w1F = new int[32];
+        for (int i=0;i<temporal.length;i++){
+            if (temporal[i]=='0'){
+                w1F[i] = 0;
+            }
+            else{
+                w1F[i] = 1;
+            }
+        }
+        
+        
+        
+        return w1F;
+    }
 }
+
+
+                
