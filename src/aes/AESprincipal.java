@@ -34,6 +34,24 @@ public class AESprincipal {
     {"E1","F8","98","11","69","D9","8E","94","9B","1E","87","E9","CE","55","28","DF"},
     {"8C","A1","89","0D","BF","E6","42","68","41","99","2D","0F","B0","54","BB","16"}};
     
+    public static String[][] InvSBox={
+    {"52","09","6A","D5","30","36","A5","38","BF","40","A3","9E","81","F3","D7","FB"},
+    {"7C","E3","39","82","9B","2F","FF","87","34","8E","43","44","C4","DE","E9","CB"},
+    {"54","7B","94","32","A6","C2","23","3D","EE","4C","95","0B","42","FA","C3","4E"},
+    {"08","2E","A1","66","28","D9","24","B2","76","5B","A2","49","6D","8B","D1","25"},
+    {"72","F8","F6","64","86","68","98","16","D4","A4","5C","CC","5D","65","B6","92"},
+    {"6C","70","48","50","FD","ED","B9","DA","5E","15","46","57","A7","8D","9D","84"},
+    {"90","D8","AB","00","8C","BC","D3","0A","F7","E4","58","05","B8","B3","45","06"},
+    {"D0","2C","1E","8F","CA","3F","0F","02","C1","AF","BD","03","01","13","8A","6B"},
+    {"3A","91","11","41","4F","67","DC","EA","97","F2","CF","CE","F0","B4","E6","73"},
+    {"96","AC","74","22","E7","AD","35","85","E2","F9","37","E8","1C","75","DF","6E"},
+    {"47","F1","1A","71","1D","29","C5","89","6F","B7","62","0E","AA","18","BE","1B"},
+    {"FC","56","3E","4B","C6","D2","79","20","9A","DB","C0","FE","78","CD","5A","F4"},
+    {"1F","DD","A8","33","88","07","C7","31","B1","12","10","59","27","80","EC","EF"},
+    {"60","51","7F","A9","19","B5","4A","0D","2D","E5","7A","9F","93","C9","9C","EF"},
+    {"A0","E0","3B","4D","AE","2A","F5","B0","C8","EB","BB","3C","83","53","99","61"},
+    {"17","2B","04","7E","BA","77","D6","26","E1","69","14","63","55","21","0C","7D"}};
+    
     public static String[][] ETabla={
     {"01","03","05","0f","11","33","55","ff","1A","2E","72","96","A1","F8","13","35"},
     {"5F","E1","38","48","D8","73","95","A4","F7","02","06","0A","1E","22","66","AA"},
@@ -87,9 +105,6 @@ public class AESprincipal {
                 case 1:{
                     menu1();
                     opcion_menu1 = opcion1.nextInt();
-                    String hexNumber = "6A";
-                    int decimal = Integer.parseInt(hexNumber, 16);
-                    System.out.println("Hex value is " + decimal);
                     String [][] mensaje={{"41","65","75","61"},{"45","73","79","63"},{"53","20","20","69"},{"20","6D","66","6C"}};
                     String [][] key={{"2B","28","AB","09"},{"7E","AE","F7","CF"},{"15","D2","15","4F"},{"16","A6","88","3C"}};
                     
@@ -97,6 +112,7 @@ public class AESprincipal {
                     lecturaKey();
                     cadena2 = lecturaDatos();
                     int i = 0;
+                    System.out.println("largo cadena 2"+cadena2.length);
                     while(i<cadena2.length){
                         for(int j=0;j<4;j++){
                             for(int k=0;k<4;k++){
@@ -104,12 +120,7 @@ public class AESprincipal {
                                 i++;
                             }
                         }
-                        for(int k=0;k<4;k++){
-                            for(int j=0;j<4;j++){
-                                System.out.print(m[k][j]);
-                            }
-                            System.out.println();
-                        }
+                        
                     cifrado(m,k);
                     }    
                     
@@ -138,7 +149,7 @@ public class AESprincipal {
                 break;
         }
         tamañocolumna=tamañoC;
-        System.out.println("aqui"+tamañocolumna);
+        
         System.out.println("\nIngrese la llave: ");
         String key = datos.nextLine();
         char[] charArrayKey = key.toCharArray();
@@ -166,6 +177,7 @@ public class AESprincipal {
         int resto = 0;
         char[] charArray = mensaje.toCharArray();
         int[] arregloAscii = new int[charArray.length];
+        
         tamaño =arregloAscii.length/16;
         int tamañototal=0;
         for(int i=1;i<10;i++){
@@ -180,6 +192,7 @@ public class AESprincipal {
             arregloAscii[i]= charArray[i];
             arregloHexa[i] = Integer.toHexString(arregloAscii[i]);
         }
+        System.out.println("\nTAMAÑO HEXA: "+arregloHexa.length);
         for (int i=arregloAscii.length;i<arregloHexa.length;i++){
             arregloHexa[i]= "00";
         }
@@ -213,7 +226,7 @@ public class AESprincipal {
             String[] w1 ={subKeys[0][i-1],subKeys[1][i-1],subKeys[2][i-1],subKeys[3][i-1]};
             
             
-            if((i%4)==0){
+            if((i%tamañocolumna)==0){
                 
                 String[] nw4 = new String[4];
                 String[] nw1 = new String[4];
@@ -439,6 +452,18 @@ public class AESprincipal {
     }
     
     private static int[] funcionT (int[] w1 , int indice){
+        int indiceparaciclo;
+        switch(opcion_menu1){
+            case 1:
+                indiceparaciclo=4;
+                break;
+            case 2:
+                indiceparaciclo=6;
+                break;
+            case 3:
+                indiceparaciclo=8;
+                break;
+        }
         String[] w1pos = new String[4];
         String[] w1posF = new String[4];
         for(int k=0;k<w1pos.length;k++){
@@ -457,9 +482,7 @@ public class AESprincipal {
         for (int i=0;i<w1B.length;i++){
             int temp;
             temp = Integer.parseInt(w1B[i],2);
-            System.out.println("temp: " + temp);
             String numHexa=String.format("%2s", Integer.toHexString(temp)).replace(' ', '0');
-            System.out.println("numero hexadecimal: " + numHexa);
             char[] tempC = numHexa.toCharArray();
             int uno = Integer.parseInt(Character.toString(tempC[0]),16);
             int dos = Integer.parseInt(Character.toString(tempC[1]),16);
@@ -478,11 +501,17 @@ public class AESprincipal {
             }
         }
         int[] rcon = new int[32];
-        int potencia= (int) Math.pow(2, (indice/4)-1);
+        int potencia= (int) Math.pow(2, (indice-4)/4);
         String hexa = String.format("%2s", Integer.toHexString(potencia)).replace(' ', '0');
         //"01"
+        System.out.println("valor hexadecimal "+hexa+"decimal "+potencia);
         hexa = hexa + "0"+ "0"+ "0"+ "0"+ "0"+ "0";
         char[] hexaor = hexa.toCharArray();
+        int[] inthexaor = new int[hexaor.length];
+        for(int i=0;i<inthexaor.length;i++){
+            inthexaor[i]=Integer.parseInt(Character.toString(hexaor[i]));
+            System.out.print(inthexaor[i]);
+        }
         
         return w1F;
     }
