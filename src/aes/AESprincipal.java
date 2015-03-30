@@ -498,8 +498,56 @@ public class AESprincipal {
       }
       return temporal;
     }
-    private static void MC(){
+    private static String[][] MC(String[][] M){
+        String[][] temporal = new String[4][4];
+        int[][][] polinomio = {{{0,2},{0,3},{0,1},{0,1}},{{0,1},{0,2},{0,3},{0,1}},{{0,1},{0,1},{0,2},{0,3}},{{0,3},{0,1},{0,1},{0,2}}};
+                        
+        String[] columna = new String[4];
+        int[][] columnaD = new int[4][2];
         
+        for (int i=0;i<4;i++){
+            int[][] arreglo=new int[4][8];
+            for(int j=0;j<4;j++){
+                 columna[j]= M[j][i];
+                 char[] charArray=columna[j].toCharArray();
+                 columnaD[j][0]= Integer.parseInt(Character.toString(charArray[0]),16);
+                 columnaD[j][1]= Integer.parseInt(Character.toString(charArray[1]),16);       
+            } 
+            for(int k =0; k<4;k++){
+                String Lcolumna = LTabla[columnaD[k][0]][columnaD[k][1]];
+                String Lpolinomio = LTabla[polinomio[i][k][0]][polinomio[i][k][1]];
+                String resultadot=Integer.toHexString((Integer.parseInt(Lcolumna, 16)+Integer.parseInt(Lpolinomio, 16))%255);
+                char[] arrayResultado = resultadot.toCharArray();
+                int dec1=Integer.parseInt(Character.toString(arrayResultado[0]),16);
+                int dec2=Integer.parseInt(Character.toString(arrayResultado[1]),16);
+                String resultado=ETabla[dec1][dec2];
+                String binarioR=String.format("%8s", Integer.toBinaryString(Integer.parseInt(resultado, 16))).replace(' ', '0');
+                char[] charBinarioR = binarioR.toCharArray();
+                int[] intBinarioR = new int [8];
+                for(int m=0;m<intBinarioR.length;m++){
+                    for(int n=0;n<intBinarioR.length;n++){
+                        if(charBinarioR[i]=='0'){
+                            intBinarioR[i]=0;
+                        }else{
+                            intBinarioR[i]=1;
+                        }
+                    }
+                }
+                arreglo[k]=intBinarioR;
+                int[] resultadoXor=xor((xor(arreglo[0],arreglo[1])),(xor(arreglo[2],arreglo[3])));
+                String bin1 = Integer.toString(resultadoXor[0])+Integer.toString(resultadoXor[1])+Integer.toString(resultadoXor[2])+Integer.toString(resultadoXor[3]);
+                String bin2 = Integer.toString(resultadoXor[4])+Integer.toString(resultadoXor[5])+Integer.toString(resultadoXor[6])+Integer.toString(resultadoXor[7]);
+                
+                String hex1=Integer.toHexString(Integer.parseInt(bin1, 2));
+                String hex2=Integer.toHexString(Integer.parseInt(bin2, 2));
+                
+                String total= hex1+hex2;
+                temporal[i][k]=total;
+            }
+            
+        }
+        
+        return temporal;
     }
     
     private static int[] xor(int[] a, int[] b) {
