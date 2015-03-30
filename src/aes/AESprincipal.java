@@ -160,7 +160,7 @@ public class AESprincipal {
     }
     
     private static String[] lecturaDatos(){
-        System.out.println("\nIngrese el mensaje : ");
+       System.out.println("\nIngrese el mensaje : ");
         String mensaje = datos.nextLine();
         int tamaño = 0;
         int resto = 0;
@@ -169,7 +169,7 @@ public class AESprincipal {
         tamaño =arregloAscii.length/16;
         int tamañototal=0;
         for(int i=1;i<10;i++){
-            if(arregloAscii.length<16*i){
+            if(arregloAscii.length<=16*i){
                 tamañototal=i;
                 i=10;
             }
@@ -398,8 +398,29 @@ public class AESprincipal {
     private static void SB(){
         
     }
-    private static void SR(){
+    private static void SR(int[][]M){ 
         
+      int[][] temporal = new int[4][4];
+      
+      for (int j=0;j>4;j++){
+        temporal[0][j] = M[0][j];          
+      }
+      
+      temporal[1][4] = M[1][0];
+      for (int j=0;j>3;j++){
+        temporal[1][j] = M[1][j+1];          
+      }
+      
+      temporal[2][0] = M[2][2];
+      temporal[2][1] = M[2][3];
+      temporal[2][2] = M[2][0];
+      temporal[2][3] = M[2][1];
+      
+      temporal[3][1] = M[3][3];
+      for (int j=1;j>4;j++){
+        temporal[3][j] = M[3][j-1];          
+      }
+      
     }
     private static void MC(){
         
