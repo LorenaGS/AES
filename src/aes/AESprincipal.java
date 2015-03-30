@@ -5,6 +5,7 @@
  */
 package aes;
 
+import java.util.Locale;
 import java.util.Scanner;
 
 /**
@@ -92,6 +93,7 @@ public class AESprincipal {
     public static int tamañocolumna;
     public static Scanner datos = new Scanner(System.in);
     public static int opcion_menu1;
+    public static String[][] subKeys = new String[4][4];
     
     public static void main(String[] args) {
         // TODO code application logic here
@@ -213,12 +215,13 @@ public class AESprincipal {
                 tamañoC = 56;
                 break;
         }
-        String[][] subKeys = new String[4][4+tamañoC];
+        subKeys = new String[4][4+tamañoC];
         for(int i=0;i<4;i++){
             for(int j=0;j<tamañocolumna;j++){
                 subKeys[i][j] = k[i][j];
             }
         }
+        
         for (int i=tamañocolumna;i<tamañoC+4;i++){
             System.out.println("indice de la llave: "+i);
             String[] temporal = new String[4];
@@ -295,8 +298,9 @@ public class AESprincipal {
                 //String binary = String.format("%8s", Integer.toBinaryString(numHex)).replace(' ', '0');
                 //System.out.println("NUM "+ numHex+" "+binary);
                 for(int j=0;j<4;j++){
-                 subKeys[j][i]=xor41A[j];   
+                 subKeys[j][i] = String.format("%2s", xor41A[j]).replace(' ', '0');   
                 }
+                
             }
             else{
                 String[] nw4 = new String[4];
@@ -367,10 +371,17 @@ public class AESprincipal {
                 //String binary = String.format("%8s", Integer.toBinaryString(numHex)).replace(' ', '0');
                 //System.out.println("NUM "+ numHex+" "+binary);
                 for(int j=0;j<4;j++){
-                 subKeys[j][i]=xor41A[j];   
+                 subKeys[j][i]=subKeys[j][i] = String.format("%2s", xor41A[j]).replace(' ', '0');   
                 }
             }
         }
+        for(int i=0;i<4;i++){
+            for(int j=0;j<subKeys[i].length;j++){
+                System.out.print(subKeys[i][j] + (" "));
+            }
+            System.out.println();
+        }
+            
     }
     
     private static void menu() {
@@ -405,8 +416,46 @@ public class AESprincipal {
     
     
     
-    private static void ARK(){
+    private static String[][] ARK(String[][] m,String[][]k){
+        String[][] temporal = new String[4][4];
+        for(int i=0;i<4;i++){
+            for(int j=0;j<4;j++){
+                
+                String texto1 = String.format("%8s", Integer.toBinaryString(Integer.parseInt(m[i][j], 16))).replace(' ', '0');
+                String texto2 = String.format("%8s", Integer.toBinaryString(Integer.parseInt(k[i][j], 16))).replace(' ', '0');
+                
+                char[] arraytexto1 = texto1.toCharArray();
+                char[] arraytexto2 = texto2.toCharArray();
+                
+                int[] binariotexto1 = new int[arraytexto1.length];
+                int[] binariotexto2 = new int[arraytexto2.length];
+                
+                for(int l=0;l<binariotexto1.length;l++){
+                    if(arraytexto1[l]=='0'){
+                        binariotexto1[l] = 0;
+                    }
+                    else{
+                        binariotexto1[l] = 1;
+                    }   
+                }
+                for(int l=0;l<binariotexto2.length;l++){
+                    if(arraytexto1[l]=='0'){
+                        binariotexto2[l] = 0;
+                    }
+                    else{
+                        binariotexto2[l] = 1;
+                    }        
+                }
+                int[] xOr = xor(binariotexto1,binariotexto2);
+                String bin1 = Integer.toString(xOr[0])+Integer.toString(xOr[1])+Integer.toString(xOr[2])+Integer.toString(xOr[3]);
+                String bin2 = Integer.toString(xOr[4])+Integer.toString(xOr[5])+Integer.toString(xOr[6])+Integer.toString(xOr[7]);
+                
+                String hex1=Integer.toHexString(Integer.parseInt(bin1, 2));
+                String hex2;
+            }
+        }
         
+        return temporal;
     }
     private static void SB(){
         
@@ -477,6 +526,7 @@ public class AESprincipal {
             w1pos[k] = w1pos[k] + Integer.toString(w1[(k*8)+7]);
         }
         
+        
         String[] w1B = {w1pos[1],w1pos[2],w1pos[3],w1pos[0]};
         
         for (int i=0;i<w1B.length;i++){
@@ -501,19 +551,59 @@ public class AESprincipal {
             }
         }
         int[] rcon = new int[32];
-        int potencia= (int) Math.pow(2, (indice-4)/4);
+        int indicepotencia=(indice-tamañocolumna)/tamañocolumna;
+        int potencia;
+        if(indicepotencia==8){
+            potencia=27;
+        }else{
+            if(indicepotencia==9){
+                potencia=54;
+            }
+            else{
+                potencia= (int) Math.pow(2,indicepotencia);
+            }
+        }
         String hexa = String.format("%2s", Integer.toHexString(potencia)).replace(' ', '0');
-        //"01"
-        System.out.println("valor hexadecimal "+hexa+"decimal "+potencia);
+        
         hexa = hexa + "0"+ "0"+ "0"+ "0"+ "0"+ "0";
         char[] hexaor = hexa.toCharArray();
-        int[] inthexaor = new int[hexaor.length];
-        for(int i=0;i<inthexaor.length;i++){
-            inthexaor[i]=Integer.parseInt(Character.toString(hexaor[i]));
-            System.out.print(inthexaor[i]);
+        String [] stringhexaor = new String[hexaor.length];
+        for(int i=0;i<stringhexaor.length;i++){
+            stringhexaor[i]=Character.toString(hexaor[i]);
+            
+        }
+        String [] stringbinor = new String[stringhexaor.length];
+        
+        for(int i=0;i<stringbinor.length;i++){
+            stringbinor[i]=String.format("%4s", Integer.toBinaryString(Integer.parseInt(stringhexaor[i], 16))).replace(' ', '0');;  
+        }
+        String stringBinOrFinal=stringbinor[0];
+        for(int i=1;i<stringbinor.length;i++){
+            stringBinOrFinal= stringBinOrFinal+stringbinor[i];
         }
         
-        return w1F;
+        char[] charArrayFinal = stringBinOrFinal.toCharArray();
+        int[] binFinal = new int[32];
+        for(int i=0;i<binFinal.length;i++){
+            if(charArrayFinal[i]=='0'){
+                binFinal[i] = 0;
+            }else{
+                binFinal[i] = 1;
+            }
+        }
+        
+        return binFinal;
+    }
+    
+    public static String[][] generateRoundKey(int indice){
+        String[][] temporal = new String[4][4];
+        for(int i=0;i<4;i++){
+            temporal[i][0]=subKeys[i][4*indice];
+            temporal[i][1]=subKeys[i][4*indice+1];
+            temporal[i][2]=subKeys[i][4*indice+2];
+            temporal[i][3]=subKeys[i][4*indice+3];
+        }
+        return temporal;
     }
 }
 
