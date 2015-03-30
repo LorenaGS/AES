@@ -206,7 +206,7 @@ public class AESprincipal {
                 subKeys[i][j] = k[i][j];
             }
         }
-        for (int i=tamañocolumna;i<tamañoC;i++){
+        for (int i=tamañocolumna;i<tamañoC+4;i++){
             System.out.println("indice de la llave: "+i);
             String[] temporal = new String[4];
             String[] w4 ={subKeys[0][i-4],subKeys[1][i-4],subKeys[2][i-4],subKeys[3][i-4]}; 
@@ -437,7 +437,7 @@ public class AESprincipal {
             int temp;
             temp = Integer.parseInt(w1B[i],2);
             System.out.println("temp: " + temp);
-            String numHexa=Integer.toHexString(temp);
+            String numHexa=String.format("%2s", Integer.toHexString(temp)).replace(' ', '0');
             System.out.println("numero hexadecimal: " + numHexa);
             char[] tempC = numHexa.toCharArray();
             int uno = Integer.parseInt(Character.toString(tempC[0]),16);
