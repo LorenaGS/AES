@@ -91,6 +91,7 @@ public class AESprincipal {
     public static String [][] m = new String[4][4];
     public static String [][] k = new String[4][4];
     public static int tamañocolumna;
+    public static int rondas;
     public static Scanner datos = new Scanner(System.in);
     public static int opcion_menu1;
     public static String[][] subKeys = new String[4][4];
@@ -114,7 +115,6 @@ public class AESprincipal {
                     lecturaKey();
                     cadena2 = lecturaDatos();
                     int i = 0;
-                    System.out.println("largo cadena 2"+cadena2.length);
                     while(i<cadena2.length){
                         for(int j=0;j<4;j++){
                             for(int k=0;k<4;k++){
@@ -142,12 +142,15 @@ public class AESprincipal {
         switch(opcion_menu1){
             case 1:
                 tamañoC = 4; 
+                rondas = 10;
                 break;
             case 2:
                 tamañoC = 6;
+                rondas = 12;
                 break;
             case 3:
                 tamañoC = 8;
+                rondas = 14;
                 break;
         }
         tamañocolumna=tamañoC;
@@ -194,7 +197,6 @@ public class AESprincipal {
             arregloAscii[i]= charArray[i];
             arregloHexa[i] = Integer.toHexString(arregloAscii[i]);
         }
-        System.out.println("\nTAMAÑO HEXA: "+arregloHexa.length);
         for (int i=arregloAscii.length;i<arregloHexa.length;i++){
             arregloHexa[i]= "00";
         }
@@ -223,7 +225,7 @@ public class AESprincipal {
         }
         
         for (int i=tamañocolumna;i<tamañoC+4;i++){
-            System.out.println("indice de la llave: "+i);
+            //System.out.println("indice de la llave: "+i);
             String[] temporal = new String[4];
             String[] w4 ={subKeys[0][i-4],subKeys[1][i-4],subKeys[2][i-4],subKeys[3][i-4]}; 
             String[] w1 ={subKeys[0][i-1],subKeys[1][i-1],subKeys[2][i-1],subKeys[3][i-1]};
@@ -375,12 +377,28 @@ public class AESprincipal {
                 }
             }
         }
+        String[][] textoCifrado = new String[4][4];
+        textoCifrado=ARK(m, k);
+        
+        for(int r=1;r<rondas;r++){
+            textoCifrado = SB(textoCifrado);
+            textoCifrado = SR(textoCifrado);         
+            textoCifrado = MC(textoCifrado);
+            textoCifrado = ARK(textoCifrado, generateRoundKey(r));
+        }
+        textoCifrado = SB(textoCifrado);
+        textoCifrado = SR(textoCifrado);
+        textoCifrado = ARK(textoCifrado, generateRoundKey(10));
+        
+        System.out.println("TEXTO CIFRADO!!!");
         for(int i=0;i<4;i++){
-            for(int j=0;j<subKeys[i].length;j++){
-                System.out.print(subKeys[i][j] + (" "));
+            for(int j=0;j<4;j++){
+                System.out.print(textoCifrado[i][j] + (" "));
             }
             System.out.println();
         }
+        
+        
             
     }
     
@@ -418,12 +436,13 @@ public class AESprincipal {
     
     private static String[][] ARK(String[][] m,String[][]k){
         String[][] temporal = new String[4][4];
+        
         for(int i=0;i<4;i++){
             for(int j=0;j<4;j++){
                 
                 String texto1 = String.format("%8s", Integer.toBinaryString(Integer.parseInt(m[i][j], 16))).replace(' ', '0');
                 String texto2 = String.format("%8s", Integer.toBinaryString(Integer.parseInt(k[i][j], 16))).replace(' ', '0');
-                
+                                
                 char[] arraytexto1 = texto1.toCharArray();
                 char[] arraytexto2 = texto2.toCharArray();
                 
@@ -439,17 +458,19 @@ public class AESprincipal {
                     }   
                 }
                 for(int l=0;l<binariotexto2.length;l++){
-                    if(arraytexto1[l]=='0'){
+                    if(arraytexto2[l]=='0'){
                         binariotexto2[l] = 0;
                     }
                     else{
                         binariotexto2[l] = 1;
                     }        
                 }
+                
                 int[] xOr = xor(binariotexto1,binariotexto2);
+                
                 String bin1 = Integer.toString(xOr[0])+Integer.toString(xOr[1])+Integer.toString(xOr[2])+Integer.toString(xOr[3]);
                 String bin2 = Integer.toString(xOr[4])+Integer.toString(xOr[5])+Integer.toString(xOr[6])+Integer.toString(xOr[7]);
-                
+                                
                 String hex1=Integer.toHexString(Integer.parseInt(bin1, 2));
                 String hex2=Integer.toHexString(Integer.parseInt(bin2, 2));
                 
@@ -457,7 +478,6 @@ public class AESprincipal {
                 temporal[i][j]=total;
             }
         }
-        
         return temporal;
     }
     private static String[][] SB(String[][] M){
@@ -475,15 +495,22 @@ public class AESprincipal {
         return temporal;
     }
     private static String[][] SR(String[][]M){ 
+      /*System.out.println("M EN SR: ");  
+      for(int i=0;i<M.length;i++){
+          for(int j=0;j<M.length;j++){
+              System.out.print(M[i][j]+ " ");
+          }
+          System.out.println();
+      }*/
         
       String[][] temporal = new String[4][4];
       
-      for (int j=0;j>4;j++){
+      for (int j=0;j<4;j++){
         temporal[0][j] = M[0][j];          
       }
       
-      temporal[1][4] = M[1][0];
-      for (int j=0;j>3;j++){
+      temporal[1][3] = M[1][0];
+      for (int j=0;j<3;j++){
         temporal[1][j] = M[1][j+1];          
       }
       
@@ -492,10 +519,10 @@ public class AESprincipal {
       temporal[2][2] = M[2][0];
       temporal[2][3] = M[2][1];
       
-      temporal[3][1] = M[3][3];
-      for (int j=1;j>4;j++){
+      temporal[3][0] = M[3][3];
+      for (int j=1;j<4;j++){
         temporal[3][j] = M[3][j-1];          
-      }
+      }    
       return temporal;
     }
     private static String[][] MC(String[][] M){
@@ -504,7 +531,6 @@ public class AESprincipal {
                         
         String[] columna = new String[4];
         int[][] columnaD = new int[4][2];
-        
         for (int i=0;i<4;i++){
             int[][] arreglo=new int[4][8];
             for(int j=0;j<4;j++){
@@ -516,7 +542,7 @@ public class AESprincipal {
             for(int k =0; k<4;k++){
                 String Lcolumna = LTabla[columnaD[k][0]][columnaD[k][1]];
                 String Lpolinomio = LTabla[polinomio[i][k][0]][polinomio[i][k][1]];
-                String resultadot=Integer.toHexString((Integer.parseInt(Lcolumna, 16)+Integer.parseInt(Lpolinomio, 16))%255);
+                String resultadot=String.format("%8s",Integer.toHexString((Integer.parseInt(Lcolumna, 16)+Integer.parseInt(Lpolinomio, 16))%255)).replace(' ', '0');
                 char[] arrayResultado = resultadot.toCharArray();
                 int dec1=Integer.parseInt(Character.toString(arrayResultado[0]),16);
                 int dec2=Integer.parseInt(Character.toString(arrayResultado[1]),16);
@@ -681,6 +707,12 @@ public class AESprincipal {
             temporal[i][3]=subKeys[i][4*indice+3];
         }
         return temporal;
+    }
+    
+    private static void imprimirArray(int[] array) {
+        for (int i = 0; i < array.length; i++) {
+            System.out.print(array[i]);
+        }
     }
 }
 
