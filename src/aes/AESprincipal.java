@@ -411,7 +411,7 @@ public class AESprincipal {
     private static void SB(){
         
     }
-    private static void SR(int[][]M){ 
+    private static int[][] SR(int[][]M){ 
         
       int[][] temporal = new int[4][4];
       
@@ -433,7 +433,7 @@ public class AESprincipal {
       for (int j=1;j>4;j++){
         temporal[3][j] = M[3][j-1];          
       }
-      
+      return temporal;
     }
     private static void MC(){
         
