@@ -71,6 +71,7 @@ public class AESprincipal {
     {"67","4A","ED","DE","C5","31","FE","18","0D","63","8C","80","C0","F7","70","07"}};
     public static String [][] m = new String[4][4];
     public static String [][] k = new String[4][4];
+    public static int tamañocolumna;
     public static Scanner datos = new Scanner(System.in);
     public static int opcion_menu1;
     
@@ -124,20 +125,37 @@ public class AESprincipal {
     }
     
     private static void lecturaKey(){
+        int tamañoC=0;
+        switch(opcion_menu1){
+            case 1:
+                tamañoC = 4; 
+                break;
+            case 2:
+                tamañoC = 6;
+                break;
+            case 3:
+                tamañoC = 8;
+                break;
+        }
+        tamañocolumna=tamañoC;
+        System.out.println("aqui"+tamañocolumna);
         System.out.println("\nIngrese la llave: ");
         String key = datos.nextLine();
         char[] charArrayKey = key.toCharArray();
         int[] arregloAsciiKey = new int[charArrayKey.length];
-        String[] arregloHexa = new String[16];
+        String[] arregloHexa = new String[4*tamañoC];
          for (int i=0;i<arregloAsciiKey.length;i++){
             arregloAsciiKey[i]= charArrayKey[i];
             arregloHexa[i] = Integer.toHexString(arregloAsciiKey[i]);
         }
+        k=new String[4][tamañocolumna]; 
+        
         for(int i=0;i<4;i++){
-            for(int j=0;j<4;j++){
+            for(int j=0;j<tamañocolumna;j++){
                 k[i][j]=arregloHexa[(4*j)+i];
-                
+                System.out.print(k[i][j]);
             }
+            System.out.println();
         }         
     }
     
@@ -184,11 +202,12 @@ public class AESprincipal {
         }
         String[][] subKeys = new String[4][4+tamañoC];
         for(int i=0;i<4;i++){
-            for(int j=0;j<4;j++){
+            for(int j=0;j<tamañocolumna;j++){
                 subKeys[i][j] = k[i][j];
             }
         }
-        for (int i=4;i<tamañoC;i++){
+        for (int i=tamañocolumna;i<tamañoC;i++){
+            System.out.println("indice de la llave: "+i);
             String[] temporal = new String[4];
             String[] w4 ={subKeys[0][i-4],subKeys[1][i-4],subKeys[2][i-4],subKeys[3][i-4]}; 
             String[] w1 ={subKeys[0][i-1],subKeys[1][i-1],subKeys[2][i-1],subKeys[3][i-1]};
@@ -255,10 +274,10 @@ public class AESprincipal {
                 for(int k=0;k<xor41T.length;k++){
                     xor41A[k] = Integer.toHexString(xor41F[k]);
                 }
-                System.out.print("\n");
-                for(int k=0;k<xor41A.length;k++){
-                    System.out.print(xor41A[k]);
-                }
+                //System.out.print("\n");
+                //for(int k=0;k<xor41A.length;k++){
+                //    System.out.print(xor41A[k]);
+                //}
                 
                 //String binary = String.format("%8s", Integer.toBinaryString(numHex)).replace(' ', '0');
                 //System.out.println("NUM "+ numHex+" "+binary);
@@ -305,7 +324,7 @@ public class AESprincipal {
                 
                 int tamaño = xor41.length/8;
                 String[] xor41T = new String[tamaño];
-                System.out.println("\nTEXTO DESCIFRADO!!! ");
+                
                 for(int k=0;k<tamaño;k++){
                     xor41T[k] = Integer.toString(xor41[(k*8)+0]);
                     xor41T[k] = xor41T[k] + Integer.toString(xor41[(k*8)+1]);
@@ -327,10 +346,10 @@ public class AESprincipal {
                 for(int k=0;k<xor41T.length;k++){
                     xor41A[k] = Integer.toHexString(xor41F[k]);
                 }
-                System.out.print("\n");
-                for(int k=0;k<xor41A.length;k++){
-                    System.out.print(xor41A[k]);
-                }
+                //System.out.print("\n");
+                //for(int k=0;k<xor41A.length;k++){
+                //    System.out.print(xor41A[k]);
+                //}
                 
                 //String binary = String.format("%8s", Integer.toBinaryString(numHex)).replace(' ', '0');
                 //System.out.println("NUM "+ numHex+" "+binary);
@@ -413,10 +432,13 @@ public class AESprincipal {
         }
         
         String[] w1B = {w1pos[1],w1pos[2],w1pos[3],w1pos[0]};
-        for (int i=0;i<w1pos.length;i++){
+        
+        for (int i=0;i<w1B.length;i++){
             int temp;
-            temp = Integer.parseInt(w1pos[i],2);
+            temp = Integer.parseInt(w1B[i],2);
+            System.out.println("temp: " + temp);
             String numHexa=Integer.toHexString(temp);
+            System.out.println("numero hexadecimal: " + numHexa);
             char[] tempC = numHexa.toCharArray();
             int uno = Integer.parseInt(Character.toString(tempC[0]),16);
             int dos = Integer.parseInt(Character.toString(tempC[1]),16);
@@ -434,8 +456,12 @@ public class AESprincipal {
                 w1F[i] = 1;
             }
         }
-        
-        
+        int[] rcon = new int[32];
+        int potencia= (int) Math.pow(2, (indice/4)-1);
+        String hexa = String.format("%2s", Integer.toHexString(potencia)).replace(' ', '0');
+        //"01"
+        hexa = hexa + "0"+ "0"+ "0"+ "0"+ "0"+ "0";
+        char[] hexaor = hexa.toCharArray();
         
         return w1F;
     }
