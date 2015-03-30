@@ -451,18 +451,32 @@ public class AESprincipal {
                 String bin2 = Integer.toString(xOr[4])+Integer.toString(xOr[5])+Integer.toString(xOr[6])+Integer.toString(xOr[7]);
                 
                 String hex1=Integer.toHexString(Integer.parseInt(bin1, 2));
-                String hex2;
+                String hex2=Integer.toHexString(Integer.parseInt(bin2, 2));
+                
+                String total= hex1+hex2;
+                temporal[i][j]=total;
             }
         }
         
         return temporal;
     }
-    private static void SB(){
+    private static String[][] SB(String[][] M){
+        String[][] temporal = new String[4][4];
         
+        for(int i=0;i<4;i++){
+            for(int j=0;j<4;j++){
+                char[] array = M[i][j].toCharArray();
+                int dec1=Integer.parseInt(Character.toString(array[0]), 16);
+                int dec2=Integer.parseInt(Character.toString(array[1]), 16);
+                
+                temporal[i][j] = SBox[dec1][dec2]; 
+            }
+        }
+        return temporal;
     }
-    private static int[][] SR(int[][]M){ 
+    private static String[][] SR(String[][]M){ 
         
-      int[][] temporal = new int[4][4];
+      String[][] temporal = new String[4][4];
       
       for (int j=0;j>4;j++){
         temporal[0][j] = M[0][j];          
@@ -593,6 +607,21 @@ public class AESprincipal {
         }
         
         return binFinal;
+    }
+    
+    private static String[][] SBmenos1(String[][] M){
+        String[][] temporal = new String[4][4];
+        
+        for(int i=0;i<4;i++){
+            for(int j=0;j<4;j++){
+                char[] array = M[i][j].toCharArray();
+                int dec1=Integer.parseInt(Character.toString(array[0]), 16);
+                int dec2=Integer.parseInt(Character.toString(array[1]), 16);
+                
+                temporal[i][j] = InvSBox[dec1][dec2]; 
+            }
+        }
+        return temporal;
     }
     
     public static String[][] generateRoundKey(int indice){
